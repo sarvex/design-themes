@@ -15,7 +15,9 @@ def post_init_hook(cr, registry):
         ('category_id', 'child_of', env.ref('base.module_category_theme').id),
     ], order='name')
     exclude_list = ['_common', '_blog', '_sale']
-    themes = themes.filtered(lambda t: not any([ex for ex in exclude_list if ex in t.name]))
+    themes = themes.filtered(
+        lambda t: not any(ex for ex in exclude_list if ex in t.name)
+    )
     assert len(themes) == len(env.ref('base.module_test_themes').dependencies_id)
 
     xmlids = []
@@ -24,10 +26,12 @@ def post_init_hook(cr, registry):
             'name': theme.display_name,
             'theme_id': theme.id,
         })
-        xmlids.append({
-            'xml_id': 'test_themes.%s' % theme.display_name.replace(' ', '_'),
-            'record': website,
-            'noupdate': True,  # Avoid unlink on -u
-        })
+        xmlids.append(
+            {
+                'xml_id': f"test_themes.{theme.display_name.replace(' ', '_')}",
+                'record': website,
+                'noupdate': True,
+            }
+        )
         theme._theme_get_stream_themes()._theme_load(website)
     env['ir.model.data']._update_xmlids(xmlids)

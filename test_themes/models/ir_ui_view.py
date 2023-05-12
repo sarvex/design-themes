@@ -23,6 +23,6 @@ class View(models.Model):
                     # prefetched by get_test_themes_websites
                     website = Website.browse(website_id)
                     if website.theme_id.sudo().image_ids:
-                        theme_img = "<img src='/web/image/%s' width='150'/>" % website.theme_id.sudo().image_ids[0].id
+                        theme_img = f"<img src='/web/image/{website.theme_id.sudo().image_ids[0].id}' width='150'/>"
                 multi_website_website['theme_img'] = theme_img
         return qcontext

@@ -18,18 +18,24 @@ class Crawler(HttpCase):
         def test_crawling():
             for website in websites_themes.filtered(lambda w: w.theme_id.name != 'theme_default'):
                 # Ensure theme is rendering without crashing
-                r = self.url_open('/?fw=%s&debug=assets' % website.id)
+                r = self.url_open(f'/?fw={website.id}&debug=assets')
                 self.assertEqual(r.status_code, 200, "Ensure theme is rendering without crashing")
 
                 # Ensure correct theme is actually loaded, see commit message
-                theme_asset_url = '/web/assets/debug/%s/web.assets_frontend.css' % website.id
+                theme_asset_url = f'/web/assets/debug/{website.id}/web.assets_frontend.css'
                 self.assertTrue(theme_asset_url in r.text)
                 r = self.url_open(theme_asset_url)
-                self.assertTrue('/%s/static/src' % website.theme_id.name in r.text, "Ensure theme is actually loaded")
+                self.assertTrue(
+                    f'/{website.theme_id.name}/static/src' in r.text,
+                    "Ensure theme is actually loaded",
+                )
                 # Ensure other website/themes are not loaded
                 for name in websites_themes_names:
                     if name != website.theme_id.name:
-                        self.assertFalse('/%s/static/src' % name in r.text, "Ensure other themes do not pollute current one")
+                        self.assertFalse(
+                            f'/{name}/static/src' in r.text,
+                            "Ensure other themes do not pollute current one",
+                        )
 
         # 1. Test as public user
         test_crawling()
